@@ -1,18 +1,24 @@
 import { NgModule } from '@angular/core';
+import { FormsModule, ReactiveFormsModule } from '@angular/forms';
 import { BrowserModule } from '@angular/platform-browser';
+import { BrowserAnimationsModule } from '@angular/platform-browser/animations';
 
-import { AppRoutingModule } from './app-routing.module';
 import { AppComponent } from './app.component';
 
+import { InputTextModule } from 'primeng/inputtext';
+import { SliderModule } from 'primeng/slider';
+import { SliderMilestoneDirective } from './shared/slider-milestone-directive/slider-milestone.directive';
+
 @NgModule({
-  declarations: [
-    AppComponent
-  ],
   imports: [
     BrowserModule,
-    AppRoutingModule
+    BrowserAnimationsModule,
+    SliderModule,
+    InputTextModule,
+    FormsModule,
+    ReactiveFormsModule,
   ],
-  providers: [],
-  bootstrap: [AppComponent]
+  declarations: [AppComponent, SliderMilestoneDirective],
+  bootstrap: [AppComponent],
 })
-export class AppModule { }
+export class AppModule {}
