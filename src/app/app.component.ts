@@ -41,10 +41,6 @@ export class AppComponent implements AfterViewInit {
 
   stepIncrement = () => {
     const step = this.changeValueDisplay();
-    console.log(
-      '🚀 ~ file: app.component.ts ~ line 44 ~ AppComponent ~ step',
-      step
-    );
     switch (true) {
       case step >= 0 && step < 10:
         return 0.1;
@@ -56,6 +52,6 @@ export class AppComponent implements AfterViewInit {
   };
 
   changeValueDisplay = () => {
-    return this.form.get('distance')!.value + 10;
+    return this.form.get('distance')!.value;
   };
 }

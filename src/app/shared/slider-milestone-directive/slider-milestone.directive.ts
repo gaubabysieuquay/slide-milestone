@@ -5,19 +5,24 @@ import {
   Input,
   Renderer2,
 } from '@angular/core';
+import { NgControl } from '@angular/forms';
 
 @Directive({
   selector: '[appSliderMilestone]',
 })
 export class SliderMilestoneDirective implements AfterViewInit {
-  @Input() milestone: number[] = [10, 100];
+  @Input() milestone: number[] = [10, 100, 1000];
   @Input() min: number = 0;
   @Input() max: number;
   @Input() equalizeSpacing: boolean = false;
   nodes = [];
   exactWidth: number = 0;
 
-  constructor(private elRef: ElementRef, private renderer: Renderer2) {}
+  constructor(
+    private elRef: ElementRef,
+    private renderer: Renderer2,
+    private control: NgControl
+  ) {}
 
   ngAfterViewInit() {
     this.addMilestone();
@@ -26,7 +31,9 @@ export class SliderMilestoneDirective implements AfterViewInit {
 
   ngOnInit() {
     this.sortAndCheckDuplicate();
-    console.log(this.elRef);
+    // this.control.control?.valueChanges.subscribe((value: number) =>
+    //   console.log(value)
+    // );
   }
 
   addMilestone = () => {
@@ -71,10 +78,7 @@ export class SliderMilestoneDirective implements AfterViewInit {
 
   equalAllMilestoneSectionWidth = () => {
     const countMilestone = this.milestone.length;
-    const calWidth = 1 / countMilestone;
-    let sliderRangeStyle =
-      this.elRef.nativeElement.querySelector('.p-slider-range').style.width;
-    console.log(sliderRangeStyle);
+    const calWidth = this.max / countMilestone;
   };
 
   sortAndCheckDuplicate = () => {
