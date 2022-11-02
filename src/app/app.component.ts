@@ -1,13 +1,5 @@
-import {
-  AfterViewInit,
-  Component,
-  ElementRef,
-  Renderer2,
-  ViewChild,
-  ViewEncapsulation,
-} from '@angular/core';
+import { Component, ViewEncapsulation } from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
-import { Slider } from 'primeng/slider';
 
 @Component({
   selector: 'app-root',
@@ -16,15 +8,15 @@ import { Slider } from 'primeng/slider';
   encapsulation: ViewEncapsulation.None,
 })
 export class AppComponent {
-  max: number = 2500;
-  min: number = 1;
+  max = 2500;
+  min = 1;
   form: FormGroup;
-  displayValue: string | number;
-  minValue: number = 0;
-  maxValue: number = 2500;
-  value: number = 0;
-  scale: any = 0;
+  minValue = 1;
+  maxValue = 2500;
+  value = 0;
+  scale = 0;
   position = 0;
+  displayValue: string | number;
 
   constructor(private fb: FormBuilder) {
     this.initForm();
@@ -39,7 +31,7 @@ export class AppComponent {
   };
 
   stepIncrement = () => {
-    let data = this.getValues(true);
+    const data = this.getValues(true);
     let val = 0;
     let calStep = this.roundNumber(this.getValueFromPosition(data.value, data));
 
@@ -69,7 +61,7 @@ export class AppComponent {
   };
 
   changeValue = (event: any) => {
-    let data = this.getValues();
+    const data = this.getValues();
     this.setPositionValue(event.value, data);
   };
 
@@ -85,7 +77,7 @@ export class AppComponent {
         : this.value;
     }
 
-    let data = {
+    const data = {
       min: Math.log(this.min),
       max: Math.log(this.max),
       scale: +this.scale,
@@ -116,7 +108,7 @@ export class AppComponent {
   }
 
   roundNumber = (num: number, decimal = 1) => {
-    let decimalNum = Math.pow(10, decimal);
+    const decimalNum = Math.pow(10, decimal);
     return Math.round((num + Number.EPSILON) * decimalNum) / decimalNum;
   };
 }
