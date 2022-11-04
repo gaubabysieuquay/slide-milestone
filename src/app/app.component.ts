@@ -11,9 +11,9 @@ export class AppComponent {
   max = 2500;
   min = 1;
   form: FormGroup;
-  minValue = 1;
+  minValue = 0;
   maxValue = 2500;
-  value = 0;
+  value = 1;
   scale = 0;
   position = 1;
   displayValue: string | number;
@@ -32,38 +32,31 @@ export class AppComponent {
 
   stepIncrement = () => {
     const data = this.getValues();
-    let currPos = 0;
-
+    let currPos = data.position;
     let nextPos = 0;
 
     switch (true) {
-      case data.value < 10:
-        return 1;
-      case data.value < 100:
-        currPos = this.roundNumber(data.position, 'ceil', 0);
-        nextPos = this.roundNumber(
-          this.getPositionFromValue(data, data.value + 1),
-          'ceil',
-          0
-        );
+      case data.value >= 0 && data.value < 10:
+        nextPos = this.getPositionFromValue(data, data.value + 0.1);
+        break;
+      case data.value > 10 && data.value < 100:
+        nextPos = this.getPositionFromValue(data, data.value + 1);
+        break;
+      case data.value > 100:
+        nextPos = this.getPositionFromValue(data, data.value + 100);
         break;
       default:
-        currPos = this.roundNumber(data.position, 'ceil', 0);
-        nextPos = this.roundNumber(
-          this.getPositionFromValue(data, data.value + 100),
-          'ceil',
-          0
-        );
-        break;
+        return 1;
     }
-    console.log(
-      '🚀 ~ file: app.component.ts ~ line 36 ~ AppComponent ~ currPos',
-      currPos
-    );
-    console.log(
-      '🚀 ~ file: app.component.ts ~ line 38 ~ AppComponent ~ nextPos',
-      nextPos
-    );
+
+    // console.log(
+    //   '🚀 ~ file: app.component.ts ~ line 36 ~ AppComponent ~ currPos',
+    //   currPos
+    // );
+    // console.log(
+    //   '🚀 ~ file: app.component.ts ~ line 38 ~ AppComponent ~ nextPos',
+    //   nextPos
+    // );
     return nextPos - currPos;
   };
 
@@ -73,17 +66,31 @@ export class AppComponent {
   };
 
   setPositionValue(position: any, data: any) {
-    if (this.value < 10) {
-      this.value = this.roundNumber(
-        this.getValueFromPosition(position, data),
-        'floor'
-      );
-    } else {
-      this.value = this.roundNumber(
-        this.getValueFromPosition(position, data),
-        'floor',
-        0
-      );
+    this.value = this.getValueFromPosition(position, data);
+    console.log(
+      '🚀 ~ file: app.component.ts ~ line 76 ~ AppComponent ~ setPositionValue ~ this.getValueFromPosition(position, data)',
+      this.getValueFromPosition(position, data)
+    );
+
+    switch (true) {
+      case this.value < 10:
+        this.value = this.roundNumber(
+          this.getValueFromPosition(position, data),
+          8
+        );
+        break;
+      case this.roundNumber(this.value) === this.max:
+        this.value = this.roundNumber(
+          this.getValueFromPosition(position, data),
+          0
+        );
+        break;
+      default:
+        this.value = this.roundNumber(
+          this.getValueFromPosition(position, data),
+          2
+        );
+        break;
     }
     // this.form.controls['distance'].setValue(position);
   }
@@ -105,10 +112,7 @@ export class AppComponent {
 
     data['scale'] = (data.max - data.min) / (data.maxValue - data.minValue);
     if (data.value) {
-      data['position'] =
-        data.value > 10
-          ? this.roundNumber(this.getPositionFromValue(data), 'ceil', 0)
-          : this.getPositionFromValue(data);
+      data['position'] = this.getPositionFromValue(data);
     }
     return data;
   }
@@ -126,16 +130,24 @@ export class AppComponent {
     );
   }
 
-  roundNumber = (num: number, roundType = 'round', decimal = 1) => {
+  roundNumber = (num: number, decimal = 1): number => {
     const decimalNum = Math.pow(10, decimal);
 
-    switch (roundType) {
-      case 'ceil':
-        return Math.ceil(num * decimalNum) / decimalNum;
-      case 'floor':
-        return Math.floor(num * decimalNum) / decimalNum;
-      default:
-        return Math.round((num + Number.EPSILON) * decimalNum) / decimalNum;
-    }
+    return +(
+      Math.round((num + Number.EPSILON) * decimalNum) / decimalNum
+    ).toFixed(decimal);
   };
+
+  // roundNumber = (num: number, roundType = 'round', decimal = 1) => {
+  //   const decimalNum = Math.pow(10, decimal);
+
+  //   switch (roundType) {
+  //     case 'ceil':
+  //       return Math.ceil((num + Number.EPSILON) * decimalNum) / decimalNum;
+  //     case 'floor':
+  //       return Math.floor((num + Number.EPSILON) * decimalNum) / decimalNum;
+  //     default:
+  //       return Math.round((num + Number.EPSILON) * decimalNum) / decimalNum;
+  //   }
+  // };
 }
