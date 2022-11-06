@@ -1,5 +1,13 @@
-import { Component, ViewEncapsulation } from '@angular/core';
+import {
+  AfterViewInit,
+  Component,
+  ElementRef,
+  Renderer2,
+  ViewChild,
+  ViewEncapsulation,
+} from '@angular/core';
 import { FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { Slider } from 'primeng/slider';
 
 @Component({
   selector: 'app-root',
@@ -7,26 +15,36 @@ import { FormBuilder, FormGroup, Validators } from '@angular/forms';
   styleUrls: ['app.component.scss'],
   encapsulation: ViewEncapsulation.None,
 })
-export class AppComponent {
-  max = 2500;
-  min = 1;
+export class AppComponent implements AfterViewInit {
+  @ViewChild('slider', { static: false }) slider: Slider;
+  sliderEl: ElementRef;
+  max = 100;
+  min = 0;
   form: FormGroup;
-  minValue = 0;
+  minValue = 1;
   maxValue = 2500;
   value = 1;
   scale = 0;
   position = 1;
-  displayValue: string | number;
+  displayValue = 1;
 
-  constructor(private fb: FormBuilder) {
+  constructor(
+    private fb: FormBuilder,
+    private elRef: ElementRef,
+    private renderer: Renderer2
+  ) {
     this.initForm();
   }
 
-  ngOnInit() {}
+  ngAfterViewInit(): void {}
+
+  ngOnInit() {
+    this.maxValue = this.maxValue + 1;
+  }
 
   initForm = () => {
     this.form = this.fb.group({
-      distance: [1, Validators.min(1)],
+      distance: [this.min],
     });
   };
 
@@ -39,24 +57,16 @@ export class AppComponent {
       case data.value >= 0 && data.value < 10:
         nextPos = this.getPositionFromValue(data, data.value + 0.1);
         break;
-      case data.value > 10 && data.value < 100:
+      case data.value >= 10 && data.value <= 100:
         nextPos = this.getPositionFromValue(data, data.value + 1);
         break;
       case data.value > 100:
         nextPos = this.getPositionFromValue(data, data.value + 100);
         break;
       default:
-        return 1;
+        break;
     }
 
-    // console.log(
-    //   '🚀 ~ file: app.component.ts ~ line 36 ~ AppComponent ~ currPos',
-    //   currPos
-    // );
-    // console.log(
-    //   '🚀 ~ file: app.component.ts ~ line 38 ~ AppComponent ~ nextPos',
-    //   nextPos
-    // );
     return nextPos - currPos;
   };
 
@@ -66,51 +76,32 @@ export class AppComponent {
   };
 
   setPositionValue(position: any, data: any) {
-    this.value = this.getValueFromPosition(position, data);
-    console.log(
-      '🚀 ~ file: app.component.ts ~ line 76 ~ AppComponent ~ setPositionValue ~ this.getValueFromPosition(position, data)',
-      this.getValueFromPosition(position, data)
-    );
-
-    switch (true) {
-      case this.value < 10:
-        this.value = this.roundNumber(
-          this.getValueFromPosition(position, data),
-          8
-        );
-        break;
-      case this.roundNumber(this.value) === this.max:
-        this.value = this.roundNumber(
-          this.getValueFromPosition(position, data),
-          0
-        );
-        break;
-      default:
-        this.value = this.roundNumber(
-          this.getValueFromPosition(position, data),
-          2
-        );
-        break;
+    if (this.roundNumber(this.value) === this.maxValue) {
+      this.value = this.roundNumber(
+        this.getValueFromPosition(position, data),
+        0
+      );
+    } else {
+      this.value = this.roundNumber(
+        this.getValueFromPosition(position, data),
+        2
+      );
     }
-    // this.form.controls['distance'].setValue(position);
+    this.displayValue = this.value - 1;
+    this.form.controls['distance'].setValue(position);
   }
 
   getValues() {
     const data = {
-      min: Math.log(this.min),
-      max: Math.log(this.max),
+      min: this.min,
+      max: this.max,
       scale: +this.scale,
       value: +this.value,
       position: this.position,
-      minValue: this.minValue,
-      maxValue: this.maxValue,
+      minValue: Math.log(this.minValue),
+      maxValue: Math.log(this.maxValue),
     };
-    console.log(
-      '🚀 ~ file: app.component.ts ~ line 73 ~ AppComponent ~ getValues ~ data',
-      data
-    );
-
-    data['scale'] = (data.max - data.min) / (data.maxValue - data.minValue);
+    data['scale'] = (data.maxValue - data.minValue) / (data.max - data.min);
     if (data.value) {
       data['position'] = this.getPositionFromValue(data);
     }
@@ -119,35 +110,21 @@ export class AppComponent {
 
   // Calculate slider value from a position
   getValueFromPosition(position: any, data: any) {
-    return Math.exp((position - data.minValue) * data.scale + data.min);
+    return Math.exp((position - data.min) * data.scale + data.minValue);
   }
 
   // Calculate slider position from a value
   getPositionFromValue(data: any, step: number = 0) {
     return (
-      data.minValue +
-      (Math.log(step ? step : data.value) - data.min) / data.scale
+      data.min +
+      (Math.log(step ? step : data.value) - data.minValue) / data.scale
     );
   }
 
   roundNumber = (num: number, decimal = 1): number => {
     const decimalNum = Math.pow(10, decimal);
-
     return +(
       Math.round((num + Number.EPSILON) * decimalNum) / decimalNum
     ).toFixed(decimal);
   };
-
-  // roundNumber = (num: number, roundType = 'round', decimal = 1) => {
-  //   const decimalNum = Math.pow(10, decimal);
-
-  //   switch (roundType) {
-  //     case 'ceil':
-  //       return Math.ceil((num + Number.EPSILON) * decimalNum) / decimalNum;
-  //     case 'floor':
-  //       return Math.floor((num + Number.EPSILON) * decimalNum) / decimalNum;
-  //     default:
-  //       return Math.round((num + Number.EPSILON) * decimalNum) / decimalNum;
-  //   }
-  // };
 }

@@ -13,10 +13,10 @@ import { NgControl } from '@angular/forms';
 export class SliderMilestoneDirective implements AfterViewInit {
   @Input() milestone: number[] = [10, 100];
   @Input() min: number = 0;
-  @Input() max: number;
+  @Input() max: number = 100;
   @Input() equalizeSpacing: boolean = false;
   @Input() minValue: any = 1;
-  @Input() maxValue: any = 1000;
+  @Input() maxValue: any = 2500;
   value: number;
   nodes = [];
   exactWidth: number = 0;
@@ -100,7 +100,6 @@ export class SliderMilestoneDirective implements AfterViewInit {
       minValue: this.minValue,
       maxValue: this.maxValue,
     };
-    console.log(data);
     data['scale'] = (data.max - data.min) / (data.maxValue - data.minValue);
     if (data.value) {
       data['position'] = this.getPositionFromValue(data);
@@ -110,11 +109,14 @@ export class SliderMilestoneDirective implements AfterViewInit {
 
   // Calculate slider value from a position
   getValueFromPosition(position: any, data: any) {
-    return Math.exp((position - data.minValue) * data.scale + data.min);
+    return Math.exp((position - data.min) * data.scale + data.minValue);
   }
 
   // Calculate slider position from a value
-  getPositionFromValue(data: any) {
-    return data.minValue + (Math.log(data.value) - data.min) / data.scale;
+  getPositionFromValue(data: any, step: number = 0) {
+    return (
+      data.min +
+      (Math.log(step ? step : data.value) - data.minValue) / data.scale
+    );
   }
 }
