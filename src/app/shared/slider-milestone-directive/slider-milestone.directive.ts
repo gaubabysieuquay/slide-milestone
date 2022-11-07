@@ -9,15 +9,16 @@ import { NgControl } from '@angular/forms';
 
 @Directive({
   selector: '[appSliderMilestone]',
+  exportAs: 'sliderMilestone',
 })
 export class SliderMilestoneDirective implements AfterViewInit {
   @Input() milestone: number[] = [10, 100];
-  @Input() min: number = 0;
-  @Input() max: number = 100;
-  @Input() equalizeSpacing: boolean = false;
-  @Input() minValue: any = 1;
-  @Input() maxValue: any = 2500;
-  value: number;
+  @Input() min = 0;
+  @Input() max = 100;
+  @Input() equalizeSpacing = false;
+  @Input() minValue = 1;
+  @Input() maxValue = 2500;
+  @Input() value = 1;
   nodes = [];
   exactWidth: number = 0;
   scale = 0;
@@ -83,24 +84,34 @@ export class SliderMilestoneDirective implements AfterViewInit {
     this.milestone = [...new Set(this.milestone)];
   };
 
-  setPositionValue(position: any, data: any) {
-    this.value = +this.getValueFromPosition(position, data).toFixed(1);
+  changeValue = (eventData: {
+    event: MouseEvent | PointerEvent;
+    value: number;
+  }) => {
+    const data = this.getValues();
+    console.log(
+      '🚀 ~ file: slider-milestone.directive.ts ~ line 92 ~ SliderMilestoneDirective ~ data',
+      data
+    );
+    this.setPositionValue(eventData.value, data);
+  };
+
+  setPositionValue(position: number, data: any) {
+    this.value = +this.getValueFromPosition(position, data).toFixed(0);
     this.control.control!.setValue(position);
   }
 
   getValues() {
-    this.value = this.control.control!.value;
-
-    let data = {
-      min: Math.log(this.min),
-      max: Math.log(this.max),
+    const data = {
+      min: this.min,
+      max: this.max,
       scale: +this.scale,
       value: +this.value,
       position: this.position,
-      minValue: this.minValue,
-      maxValue: this.maxValue,
+      minValue: Math.log(this.minValue),
+      maxValue: Math.log(this.maxValue),
     };
-    data['scale'] = (data.max - data.min) / (data.maxValue - data.minValue);
+    data['scale'] = (data.maxValue - data.minValue) / (data.max - data.min);
     if (data.value) {
       data['position'] = this.getPositionFromValue(data);
     }
@@ -108,7 +119,7 @@ export class SliderMilestoneDirective implements AfterViewInit {
   }
 
   // Calculate slider value from a position
-  getValueFromPosition(position: any, data: any) {
+  getValueFromPosition(position: number, data: any) {
     return Math.exp((position - data.min) * data.scale + data.minValue);
   }
 

@@ -1,15 +1,15 @@
 <form [formGroup]="form">
   <h5>Slider Value: {{ form.get("distance")!.value }}</h5>
-  <h5>Value: {{ displayValue }}</h5>
+  <h5>Value: {{ sliderMilestone.value }}</h5>
+  <h5>{{ displayValue }}</h5>
   <p-slider
-    #slider
     formControlName="distance"
     [min]="min"
     [max]="max"
     [minValue]="minValue"
     [maxValue]="maxValue"
-    [step]="stepIncrement()"
-    (onChange)="changeValue($event)"
+    (onChange)="sliderMilestone.changeValue($event); onHandleChange($event)"
     appSliderMilestone
+    #sliderMilestone="sliderMilestone"
   ></p-slider>
 </form>
