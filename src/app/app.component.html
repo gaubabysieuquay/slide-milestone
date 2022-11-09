@@ -1,15 +1,18 @@
-<form [formGroup]="form">
-  <h5>Slider Value: {{ form.get("distance")!.value }}</h5>
-  <h5>Value: {{ sliderMilestone.value }}</h5>
-  <h5>{{ displayValue }}</h5>
-  <p-slider
-    formControlName="distance"
-    [min]="min"
-    [max]="max"
-    [minValue]="minValue"
-    [maxValue]="maxValue"
-    (onChange)="sliderMilestone.changeValue($event); onHandleChange($event)"
-    appSliderMilestone
-    #sliderMilestone="sliderMilestone"
-  ></p-slider>
-</form>
+<div class="container">
+  <form [formGroup]="form">
+    <h5>Slider Value: {{ form.get("distance")!.value }}</h5>
+    <h5>Value: {{ sliderMilestone.value }}</h5>
+    <h5>{{ displayValue | number: "1.0-1" }}</h5>
+    <p-slider
+      formControlName="distance"
+      [min]="min"
+      [max]="max"
+      [maxValue]="maxValue"
+      (onChange)="sliderMilestone.changeValue($event); onHandleChange()"
+      appSliderMilestone
+      #sliderMilestone="sliderMilestone"
+    ></p-slider>
+  </form>
+  <p>Table</p>
+</div>
+<!-- [minValue]="minValue" -->
