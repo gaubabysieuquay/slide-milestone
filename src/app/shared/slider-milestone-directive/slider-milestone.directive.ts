@@ -48,21 +48,17 @@ export class SliderMilestoneDirective implements AfterViewInit, OnInit {
   };
 
   createMilestoneNode = (val: number, index: number) => {
-    const isHasLabel = val === this.maxValue || val === this.min ? 'km' : '';
+    const isHasLabel =
+      val === this.maxValue || val === this.min ? `${val}km` : `${val}`;
     const milestoneEl = this.elRef.nativeElement.querySelector(
       '.milestone-container'
     );
     const nodeEl = this.renderer.createElement('span');
-    const nodeContent = this.renderer.createText(`${val}`);
-
-    const nodeLabelEl = this.renderer.createElement('span');
-    const nodeLabelContent = this.renderer.createText(isHasLabel);
+    const nodeContent = this.renderer.createText(isHasLabel);
 
     nodeEl.classList.add(`milestone-value-${index}`);
     this.renderer.appendChild(milestoneEl, nodeEl);
-    this.renderer.appendChild(milestoneEl, nodeLabelEl);
     this.renderer.appendChild(nodeEl, nodeContent);
-    this.renderer.appendChild(nodeLabelEl, nodeLabelContent);
   };
 
   calculateMilestoneNode = () => {
@@ -80,7 +76,10 @@ export class SliderMilestoneDirective implements AfterViewInit, OnInit {
       this.exactWidth = this.exactWidth + calWidth;
 
       // set['width'] = `${calWidth}%`;
-      set['width'] = x === 0 ? 'fit-content' : `${calWidth}%`;
+      set['width'] = `${calWidth}%`;
+      if (x === this.min) {
+        set['text-align'] = 'left';
+      }
 
       Object.entries(set).forEach(([name, value]) => {
         style.setProperty(name, value, 'important');
@@ -105,7 +104,7 @@ export class SliderMilestoneDirective implements AfterViewInit, OnInit {
       console.log({ position });
       eventData.value = position;
     }
-    // this.setPositionValue(position);
+    this.setPositionValue(position);
   };
 
   setPositionValue(position: number, data?: any) {

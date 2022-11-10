@@ -23,6 +23,7 @@ export class AppComponent implements AfterViewInit {
 
   ngOnInit() {
     this.max = this.getMaxPosition(this.maxValue);
+    this.getDisplayValue(190);
   }
 
   initForm = () => {
